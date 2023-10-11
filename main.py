@@ -17,6 +17,7 @@ def explore(s, strings, expansions, assigns, contained_letters):
         return check(s, strings, assigns)
     letter = list(expansions.keys())[0]
     expansion_list = expansions[letter]
+    
 
     # Skip all expansions if letter not in any string
     if letter not in contained_letters:
@@ -26,16 +27,6 @@ def explore(s, strings, expansions, assigns, contained_letters):
             return True
     else: 
         for expansion in expansion_list:
-            # Skip expansion if not all letters in s
-            skip_exp = False
-            for char in expansion: 
-                if char not in s:
-                    skip_exp = True
-                    break
-            if skip_exp:
-                continue
-
-
             assigns[letter] = expansion
             expansions_copy = expansions.copy()
             expansions_copy.pop(letter)
@@ -45,7 +36,19 @@ def explore(s, strings, expansions, assigns, contained_letters):
 
     return False
 
+# Removes expansions which contains letters not in s
+def preprocess(s, expansions):
+    new_expansions = {}
 
+    keys = list(expansions.keys())
+    for key in keys:
+        new_exp = []
+        expansions_list = expansions[key]
+        for e in expansions_list:
+            if e in s:
+                new_exp.append(e)
+        new_expansions[key] = new_exp
+    return new_expansions
 
 # Setup and input
 Gamma = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
@@ -64,9 +67,10 @@ for i in range(n):
             contained_letters.append(char)
 
 expansions = {}
-for _ in range(26):
+for _ in range(26): # TODO: change this.
     letter, exp = input().split(":")
     expansions[letter] = exp.split(",")
 
 assigns = {}
+expansions = preprocess(s, expansions)
 print(explore(s, strings, expansions, assigns, contained_letters))
