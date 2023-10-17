@@ -8,8 +8,7 @@ def check(s, strings, assigns):
                 expanded += char
         if expanded not in s:
             return False
-    print(assigns)
-    return True
+    return assigns
 
 def explore(s, strings, expansions, assigns, contained_letters):
     if len(expansions) == 0:
@@ -21,8 +20,8 @@ def explore(s, strings, expansions, assigns, contained_letters):
         assigns[letter] = expansion
         expansions_copy = expansions.copy()
         expansions_copy.pop(letter)
-        if explore(s, strings, expansions_copy, assigns, contained_letters):
-            return True
+        if res := explore(s, strings, expansions_copy, assigns, contained_letters):
+            return res
         assigns.pop(letter)
 
     return False
@@ -30,7 +29,7 @@ def explore(s, strings, expansions, assigns, contained_letters):
 # Removes expansions which contains letters not in s
 def preprocess(s, letters, expansions):
     new_expansions = {}
-
+    assigns = {}
     keys = list(expansions.keys())
     for key in keys:
         if key in letters:
@@ -40,28 +39,70 @@ def preprocess(s, letters, expansions):
                 if e in s:
                     new_exp.append(e)
             new_expansions[key] = new_exp
-    return new_expansions
+        else:
+            assigns[key] = expansions[key][0]
+    return new_expansions, assigns
 
-# Setup and input
+def print_formatted(res):
+    if not res:
+        print("NO")
+    else:
+        assigns = list(res.keys())
+        assigns.sort()
+        for key in assigns:
+            print(key + ":" + res[key])
+
+
+
+Sigma = [chr(i) for i in range(ord('a'), ord('z') + 1)]
 Gamma = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 
-n = int(input())
-s = input()
+def main():
+    # Setup and input
+    try:
+        k = int(input())
+    except ValueError:
+        print("NO")
+        return 
+    if k <= 0:
+        print("NO")
+        return
+    s = input().strip()    
 
-strings = []
-contained_letters = []
-for i in range(n):
-    string = input()
-    strings.append(string)
-    for char in string:
-        if char not in contained_letters and char in Gamma:
-            contained_letters.append(char)
+    strings = []
+    contained_letters = []
+    for _ in range(k):
+        string = input()
+        strings.append(string)
+        for char in string:
+            if char not in Gamma and char not in Sigma:
+                print("NO")
+                return
+            if char not in contained_letters and char in Gamma:
+                contained_letters.append(char)
 
-expansions = {}
-for _ in range(26): # TODO: change this.
-    letter, exp = input().split(":")
-    expansions[letter] = exp.split(",")
+    expansions = {}
 
-assigns = {}
-expansions = preprocess(s, contained_letters, expansions)
-print(explore(s, strings, expansions, assigns, contained_letters))
+    while True:
+        try:
+            line = input()
+            try:
+                letter, exp = line.split(":")
+                if exp.strip() == "":
+                    print("NO")
+                    return
+            except ValueError:
+                print("NO")
+                return
+            expansions[letter] = exp.split(",")
+
+        except EOFError: 
+            break
+    assigns = {}
+    expansions, assigns = preprocess(s, contained_letters, expansions)
+    res = explore(s, strings, expansions, assigns, contained_letters)
+    print_formatted(res)
+    return
+
+if __name__ == "__main__":
+    main()
