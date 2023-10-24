@@ -1,3 +1,4 @@
+# Verifies a specific assignment
 def check(s, strings, assigns):
     for string in strings:
         expanded = ""
@@ -7,6 +8,7 @@ def check(s, strings, assigns):
             return False
     return assigns
 
+# Recursively search combinations of the preprocessed input. Returns if a satisfying assignment is found.
 def explore(s, strings, expansions, assigns, contained_letters):
     if len(expansions) == 0:
         return check(s, strings, assigns)
@@ -23,7 +25,7 @@ def explore(s, strings, expansions, assigns, contained_letters):
 
     return False
 
-# Removes expansions which contains letters not in s
+# Removes expansions which contains letters not in s and assigns letters in Gamma not in any t_i to first possibilty.
 def preprocess(s, letters, expansions):
     new_expansions = {}
     assigns = {}
@@ -41,23 +43,15 @@ def preprocess(s, letters, expansions):
     return new_expansions, assigns
 
 def print_formatted(res):
-    if not res:
-        print("NO")
-    else:
-        assigns = list(res.keys())
-        assigns.sort()
-        for key in assigns:
-            print(key + ":" + res[key])
+    assigns = list(res.keys())
+    assigns.sort()
+    for key in assigns:
+        print(key + ":" + res[key])
+
 
 
 Sigma = [chr(i) for i in range(ord('a'), ord('z') + 1)]
 Gamma = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
-
-
-
-
-
-
 
 def main():
     # Setup and input
@@ -76,7 +70,7 @@ def main():
     expansions = {}
     assigns = {}
 
-    # Read and handle strings t_i, 1<=i<=k
+    # Read and handle strings t_i
     for _ in range(k):
         string = input()
         for char in string:
@@ -87,13 +81,13 @@ def main():
                 contained_letters.append(char)
         strings.append(string)
 
-    # Read expansion sets
+    # Read expansion sets R_i
     while True:
         try:
             line = input()
         except EOFError: 
             break
-        
+
         if ":" not in line:
             print("NO")
             return
@@ -105,24 +99,20 @@ def main():
         
         expansions[letter] = exp.split(",")
     
+    # Ensure no contained letter is missing expansion definition
     for letter in contained_letters:
         if letter not in expansions:
             print("NO")
             return
-
+        
+    # Preproces
     expansions, assigns = preprocess(s, contained_letters, expansions)
-    for key in expansions.keys():
-        if expansions[key] == []:
-            print("NO")
-            return
 
-    res = explore(s, strings, expansions, assigns, contained_letters)
-    print_formatted(res)
-
-
-
-
-
+    # Explore and print result
+    if res := explore(s, strings, expansions, assigns, contained_letters):
+        print_formatted(res)
+    else: 
+        print("NO")
 
 if __name__ == "__main__":
     main()
