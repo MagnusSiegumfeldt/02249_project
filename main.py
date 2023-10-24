@@ -64,7 +64,7 @@ def main():
     except ValueError:
         print("NO")
         return 
-    if k <= 0:
+    if k < 0:
         print("NO")
         return
     s = input().strip()    
@@ -88,21 +88,33 @@ def main():
             line = input()
             try:
                 letter, exp = line.split(":")
-                if exp.strip() == "":
-                    print("NO")
-                    return
             except ValueError:
                 print("NO")
                 return
+            if letter == "" or letter not in Gamma:
+                print("NO")
+                return
             expansions[letter] = exp.split(",")
-
         except EOFError: 
             break
+    
+    for letter in contained_letters:
+        if letter not in expansions:
+            print("NO")
+            return
+
     assigns = {}
     expansions, assigns = preprocess(s, contained_letters, expansions)
+    for key in expansions.keys():
+        if expansions[key] == []:
+            print("NO")
+            return
+
     res = explore(s, strings, expansions, assigns, contained_letters)
-    print_formatted(res)
+    if res != 1:
+        print_formatted(res)
     return
 
 if __name__ == "__main__":
     main()
+    
