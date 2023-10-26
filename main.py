@@ -64,17 +64,23 @@ def main():
     if k < 0:
         print("NO")
         return
-
-    s = input().strip()    
+    try:
+        s = input().strip()    
+    except EOFError:
+        print("NO")
+        return
     strings = []
     contained_letters = []
     expansions = {}
     assigns = {}
 
-    # Read and handle strings t_i¨
-    
+    # Read and handle strings t_i
     for _ in range(k):
-        string = input()
+        try:
+            string = input()
+        except EOFError:
+            print("NO")
+            return
         for char in string:
             if char not in Gamma and char not in Sigma:
                 print("NO")
