@@ -54,6 +54,7 @@ Sigma = [chr(i) for i in range(ord('a'), ord('z') + 1)]
 Gamma = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 
 def main():
+    
     # Setup and input
     try:
         k = int(input())
@@ -70,7 +71,8 @@ def main():
     expansions = {}
     assigns = {}
 
-    # Read and handle strings t_i
+    # Read and handle strings t_i¨
+    
     for _ in range(k):
         string = input()
         for char in string:
@@ -80,7 +82,7 @@ def main():
             if char not in contained_letters and char in Gamma:
                 contained_letters.append(char)
         strings.append(string)
-
+    
     # Read expansion sets R_i
     while True:
         try:
@@ -88,32 +90,42 @@ def main():
         except EOFError: 
             break
 
-        if ":" not in line:
+        if line.count(":") != 1:
             print("NO")
             return
-        
         letter, exp = line.split(":")
-        if letter == "" or letter not in Gamma:
+        
+        if letter == "" or letter not in Gamma or letter in expansions:
             print("NO")
             return
-        
-        expansions[letter] = exp.split(",")
+        expansion_list = exp.split(",")
+        if (len(expansion_list) != len(set(expansion_list))):
+            print("NO")
+            return
+        for expans in expansion_list:
+            for char in expans: 
+                if char not in Sigma:
+                    print("NO")
+                    return
+        expansions[letter] = expansion_list
     
     # Ensure no contained letter is missing expansion definition
     for letter in contained_letters:
         if letter not in expansions:
             print("NO")
             return
+       
         
     # Preproces
     expansions, assigns = preprocess(s, contained_letters, expansions)
-
+    
     # Explore and print result
     if res := explore(s, strings, expansions, assigns, contained_letters):
         print_formatted(res)
     else: 
         print("NO")
-
+    
 if __name__ == "__main__":
     main()
+    
     
