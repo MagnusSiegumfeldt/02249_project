@@ -54,7 +54,6 @@ Sigma = [chr(i) for i in range(ord('a'), ord('z') + 1)]
 Gamma = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
 
 def main():
-    
     # Setup and input
     try:
         k = int(input())
